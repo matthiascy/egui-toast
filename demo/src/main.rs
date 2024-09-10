@@ -4,7 +4,7 @@ use eframe::egui;
 use eframe::epaint::Margin;
 use egui::{Align2, Color32, Direction, Frame, Pos2, RichText, Widget};
 
-use egui_toast::{Toast, ToastKind, ToastOptions, Toasts};
+use egui_toast::{Toast, ToastKind, ToastOptions, ToastStyle, Toasts};
 
 /// Identifier for a custom toast kind
 const MY_CUSTOM_TOAST: u32 = 0;
@@ -14,7 +14,7 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "egui-toast demo",
         eframe::NativeOptions::default(),
-        Box::new(|_cc| Box::<Demo>::default()),
+        Box::new(|_cc| Ok(Box::<Demo>::default())),
     )
 }
 
@@ -138,7 +138,7 @@ impl Demo {
                     egui::DragValue::new(duration_sec)
                         .fixed_decimals(1)
                         .speed(0.1)
-                        .clamp_range(0..=100)
+                        .range(0..=100)
                         .suffix("s")
                         .ui(ui);
                     ui.label("Duration");
@@ -169,22 +169,28 @@ impl Demo {
                     .show_progress(*show_progress)
                     .duration(duration);
 
+                let style = ToastStyle::default();
+
                 if ui.button("Give me a toast").clicked() {
-                    toasts.add(Toast {
-                        kind: *kind,
-                        text: format!("Hello, I am a toast {}", i).into(),
-                        options,
-                    });
+                    toasts.add(
+                        Toast::default()
+                            .kind(*kind)
+                            .text(format!("Hello, I am a toast {}", i))
+                            .options(options)
+                            .style(style.clone()),
+                    );
 
                     *i += 1;
                 }
 
                 if ui.button("Give me a custom toast").clicked() {
-                    toasts.add(Toast {
-                        text: format!("Hello, I am a custom toast {}", i).into(),
-                        kind: ToastKind::Custom(MY_CUSTOM_TOAST),
-                        options,
-                    });
+                    toasts.add(
+                        Toast::default()
+                            .kind(ToastKind::Custom(MY_CUSTOM_TOAST))
+                            .text(format!("Hello, I am a custom toast {}", i))
+                            .options(options)
+                            .style(style.clone()),
+                    );
 
                     *i += 1;
                 }
